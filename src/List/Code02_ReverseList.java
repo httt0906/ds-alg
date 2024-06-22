@@ -22,12 +22,12 @@ public class Code02_ReverseList {
 
     public static Node reverseList(Node head){
         Node pre = head;
-        Node tmp = null;
+        Node p = null;
         while (pre.next != null) {
-            tmp = pre.next;
-            pre.next = tmp.next;
-            tmp.next = head;
-            head = tmp;    
+            p = pre.next;
+            pre.next = p.next;
+            p.next = head;
+            head = p;  
         }
         return head;
     }
@@ -37,14 +37,14 @@ public class Code02_ReverseList {
         DoubleNode p = null;
         while (pre.next != null) {
             p = pre.next;
-            p.last = null;
-            p.next = head;
-
             pre.next = p.next;
-            p.next.last = pre;
+			if (p.next != null){
+				p.next.last = pre;
+			}           
+			p.last = null;
+			p.next = head;
+			head.last = p;
             head = p;
-            pre = pre.next;
-            
         }
         return head;
     }
