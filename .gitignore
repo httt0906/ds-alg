@@ -1,4 +1,5 @@
 .vscode/
 lib/
+bin/
 *.class
 README.md
