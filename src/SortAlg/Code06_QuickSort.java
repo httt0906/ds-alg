@@ -23,8 +23,8 @@ public class Code06_QuickSort {
         int[] bounds = netherlandsFlagQ2(arr, arr[r], l, r);
         int lBound = bounds[0];
         int rBound = bounds[1];
-        quickSortNotImprove(arr, l, lBound);
-        quickSortNotImprove(arr, rBound, r);        
+        quickSort(arr, l, lBound);
+        quickSort(arr, rBound, r);        
     }
 
 
