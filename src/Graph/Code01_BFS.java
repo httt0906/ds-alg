@@ -13,7 +13,7 @@ public class Code01_BFS {
             return;
         }
         HashSet<Node> set = new HashSet<>();
-        Queue<Node> queue = new LinkedList();
+        Queue<Node> queue = new LinkedList<>();
 
         queue.add(node);
         set.add(node);
