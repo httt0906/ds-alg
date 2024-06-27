@@ -27,14 +27,19 @@ public class Code06_Dijkstra {
         while (!V.isEmpty()){
             p = findNotNullMinDistNodeInSetV(dist, V);
             // System.out.println("Get" + index.get(p));
+            V.remove(p);
+            S.add(p);
+
+            if (p == null) {
+                break;
+            }
+
             for (Edge e : p.edges) {
                 if (dist.get(e.to) == null || dist.get(e.to) > dist.get(p) + e.weight){
                     dist.put(e.to, dist.get(p) + e.weight);
                     pre.put(e.to, p);
                 }
             }
-            V.remove(p);
-            S.add(p);
         }
 
         int i = 0;
@@ -83,9 +88,9 @@ public class Code06_Dijkstra {
         Graph graph = GraphUtils.createGraph(matrix);
         graph.printGraph();
 
-        int r = (int) ((graph.nodes.size() + 1) * Math.random());
-
-        Node p = graph.nodes.get(1);
+        Integer r = (int) ((graph.nodes.size()) * Math.random()) + 1;
+        Node p = graph.nodes.get(r);
+    
         Integer[][] infoMatrix =  dijkstra(graph, p);
         printDijkstraResult(infoMatrix);
     }
