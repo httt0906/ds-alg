@@ -1,60 +1,93 @@
 package Graph;
 
 import java.util.HashMap;
-import java.util.TreeMap;
+import java.util.HashSet;
 
 public class Code06_Dijkstra {
 
-    public static class Result {
-        HashMap<Node, Integer> index;
-        HashMap<Node, Integer> dist;
-        HashMap<Node, Node> pre;
-
-        public Result(HashMap<Node, Integer> index, HashMap<Node, Integer> dist, HashMap<Node, Node> pre){
-            this.index = index;
-            this.dist = dist;
-            this.pre = pre;
-        }
-        
-    }
-
-    public static Integer[][] dijkstra(Graph graph, Node node){   
+    public static Integer[][] dijkstra(Graph graph, Node node){
+        // 1. 初始化算法起点 S V-S 
         HashMap<Node, Integer> index = GraphUtils.convertIndex(graph.nodes);
+
         HashMap<Node, Integer> dist = new HashMap<>();
         HashMap<Node, Node> pre = new HashMap<>();
 
-        TreeMap<Node, Integer> map = new TreeMap<>((a, b) -> 
-            Integer.valueOf(b.value).compareTo(Integer.valueOf(a.value)));        // map:node-dist
-        // sort by dist
-        for (Node n : graph.nodes.values()) {
-            map.put(node, Integer.MAX_VALUE);
-            dist.put(n, Integer.MAX_VALUE);
+        HashSet<Node> S = new HashSet<>();
+        HashSet<Node> V = new HashSet<>();
+        for (Node n : index.keySet()) {
+            V.add(n);
             pre.put(n, null);
+            dist.put(n, null);
         }
         dist.put(node, 0);
-        map.put(node, 0);
 
-        Node key = null;
-        Integer d = null;
-        while (!map.isEmpty()){
-            // 1. 找到dist中数值最小且不在的节点o
-            key = map.firstKey();
-            d = map.get(key);            
-            // 2. 寻找o的联通结点 更新dist,pre 将o从set中移除
-            for (Edge e : key.edges){
-                if (d + e.weight < dist.get(key)){
-                    dist.put(key, d + e.weight);
-                    pre.put(e.to, key);
+        // 2. 从V-S中选择出具有最短特殊路径的节点u 特殊路径是从源出发只经过S中点到达u的路径
+        
+        Node p = null;
+        while (!V.isEmpty()){
+            p = findNotNullMinDistNodeInSetV(dist, V);
+            // System.out.println("Get" + index.get(p));
+            for (Edge e : p.edges) {
+                if (dist.get(e.to) == null || dist.get(e.to) > dist.get(p) + e.weight){
+                    dist.put(e.to, dist.get(p) + e.weight);
+                    pre.put(e.to, p);
                 }
             }
-            map.remove(key);
-        }
-        
-        Integer[][] info = new Integer[graph.nodes.size()][3];
-        for (Integer[] integers : info) {
-            
+            V.remove(p);
+            S.add(p);
         }
 
+        int i = 0;
+        Integer[][] matrix = new Integer[graph.nodes.size()][3];
+        for (Node q : graph.nodes.values()) {
+            matrix[i][0] = index.get(q);
+            matrix[i][1] = dist.get(q);
+            matrix[i][2] = index.get(pre.get(q));
+            i++;
+        }
+        return matrix;
     }
-    
+
+
+    private static Node findNotNullMinDistNodeInSetV(HashMap<Node, Integer> dist, HashSet<Node> v) {
+        Node p = null;
+        Integer min = Integer.MAX_VALUE;
+        for (Node q : dist.keySet()) {
+            if (v.contains(q) && dist.get(q) != null && dist.get(q) < min){
+                p = q;
+                min = dist.get(q);
+            }
+        }
+        return p;
+    }
+
+    public static void printDijkstraResult(Integer[][] matrix){
+        System.out.println("==========Dijstra Result==========");
+        System.out.printf("%-6s|%-6s|%-6s\n", "Node", "Dist", "Pre");
+        for (int i = 0; i < matrix.length; i++) {
+            System.out.printf("%-6d|%-6d|%-6d\n", matrix[i][0], matrix[i][1], matrix[i][2]);
+        }
+    }
+
+    public static void main(String[] args) {
+        Integer[][] matrix = {
+            {10, 1, 2},
+            {50, 2, 3},
+            {20, 4, 3},
+            {60, 4, 5},
+            {100, 1, 5},
+            {30, 1, 4},
+            {10, 3, 5}
+        };
+
+        Graph graph = GraphUtils.createGraph(matrix);
+        graph.printGraph();
+
+        int r = (int) ((graph.nodes.size() + 1) * Math.random());
+
+        Node p = graph.nodes.get(1);
+        Integer[][] infoMatrix =  dijkstra(graph, p);
+        printDijkstraResult(infoMatrix);
+    }
+   
 }
